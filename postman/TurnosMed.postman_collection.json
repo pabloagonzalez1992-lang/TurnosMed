@@ -1,0 +1,297 @@
+{
+  "info": {
+    "name": "TurnosMed API",
+    "description": "Colección de pruebas de la API REST de TurnosMed con validaciones Zod, filtros query params, y respuestas de mock server.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "health"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Health returns 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "pm.test('Health payload is valid', function () {",
+              "  const body = pm.response.json();",
+              "  pm.expect(body).to.have.property('ok', true);",
+              "  pm.expect(body).to.have.property('service', 'turnos-medicos');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/dashboard",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "dashboard"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Dashboard returns 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "pm.test('Dashboard returns object with metrics', function () {",
+              "  const body = pm.response.json();",
+              "  pm.expect(body).to.be.an('object');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "GET /medicos con filtros query params",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/medicos?especialidad=Cardiologia&disponible=true",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "medicos"
+          ],
+          "query": [
+            {
+              "key": "especialidad",
+              "value": "Cardiologia"
+            },
+            {
+              "key": "disponible",
+              "value": "true"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('GET medicos query params returns 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "pm.test('GET medicos query params returns array', function () {",
+              "  const body = pm.response.json();",
+              "  pm.expect(body).to.be.an('array');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "GET /turnos con filtros query params",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/turnos?especialidad=Cardiologia&fecha=2026-09-11",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "turnos"
+          ],
+          "query": [
+            {
+              "key": "especialidad",
+              "value": "Cardiologia"
+            },
+            {
+              "key": "fecha",
+              "value": "2026-09-11"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('GET turnos query params returns 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "pm.test('GET turnos query params returns an array', function () {",
+              "  const body = pm.response.json();",
+              "  pm.expect(body).to.be.an('array');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "POST /medicos validación Zod 400",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"nombre\":\"\",\"especialidad\":\"Cardiologia\",\"matricula\":\"CO-1002\",\"disponible\":true}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/medicos",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "medicos"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Zod validation error returns 400', function () {",
+              "  pm.response.to.have.status(400);",
+              "});",
+              "pm.test('Error body follows standardized JSON shape', function () {",
+              "  const body = pm.response.json();",
+              "  pm.expect(body).to.have.property('status', 400);",
+              "  pm.expect(body).to.have.property('message');",
+              "  pm.expect(body).to.have.property('code', 'VALIDATION_ERROR');",
+              "  pm.expect(body).to.have.property('details').that.is.an('array');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "POST /turnos validación Zod 400",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"paciente\":\"Luisa\",\"fecha\":\"2026-09-11\",\"hora\":\"99:00\",\"especialidad\":\"Cardiologia\",\"medicoId\":1,\"estado\":\"confirmado\"}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/turnos",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "turnos"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Zod validation error returns 400', function () {",
+              "  pm.response.to.have.status(400);",
+              "});",
+              "pm.test('Turno error response structure', function () {",
+              "  const body = pm.response.json();",
+              "  pm.expect(body).to.have.property('status', 400);",
+              "  pm.expect(body).to.have.property('message');",
+              "  pm.expect(body).to.have.property('code', 'VALIDATION_ERROR');",
+              "  pm.expect(body.details).to.be.an('array');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Mock Server GET /medicos",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{mockUrl}}/medicos",
+          "host": [
+            "{{mockUrl}}"
+          ],
+          "path": [
+            "medicos"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Mock Server response is 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "pm.test('Mock Server returns an array', function () {",
+              "  const body = pm.response.json();",
+              "  pm.expect(body).to.be.an('array');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api",
+      "type": "string"
+    },
+    {
+      "key": "mockUrl",
+      "value": "https://your-postman-mock.example.com",
+      "type": "string"
+    }
+  ]
+}
